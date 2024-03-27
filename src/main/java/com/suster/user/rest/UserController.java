@@ -25,8 +25,13 @@ public class UserController {
     @Produces(MediaType.APPLICATION_JSON)
     public Uni<RestResponse<User>> registerUser(UserRequestDto userRequestDto) {
         return userRequestDto.toEntity().onItem()
-                .transformToUni(user -> userRepository.persistAndFlush(user)
-                        .map(persisted -> RestResponse.ok()));
+                .transformToUni(user -> {
+                    // TODO: Validation and error handling
+
+                    return userRepository.persistAndFlush(user);
+                }
+                )
+                .map(persisted -> RestResponse.ok());
 
     }
 
