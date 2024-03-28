@@ -5,11 +5,9 @@ import com.suster.user.dto.UserRequestDto;
 import com.suster.user.vao.User;
 import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.jboss.resteasy.reactive.RestResponse;
 
 import java.awt.*;
@@ -24,7 +22,7 @@ public class UserController {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Uni<RestResponse<User>> registerUser(UserRequestDto userRequestDto) {
-        return userRequestDto.toEntity().onItem()
+        return userRequestDto.toEntityUni().onItem()
                 .transformToUni(user -> {
                     // TODO: Validation and error handling
 
@@ -39,5 +37,14 @@ public class UserController {
     @Produces(MediaType.APPLICATION_JSON)
     public Uni<List<User>> findAllUsers() {
         return userRepository.listAll();
+    }
+
+    @Path("/getByEmail/{email}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Uni<Response> getByEmail(@PathParam("email") String email) {
+        return userRepository.findByEmail(email)
+                .onItem().ifNotNull().transform(user -> Response.ok(user).build())
+                .onItem().ifNull().continueWith(() -> Response.status(404).build());
     }
 }

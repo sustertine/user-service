@@ -11,12 +11,21 @@ public class UserRequestDto {
     private String email;
     private String password;
 
-    public Uni<User> toEntity() {
+    public Uni<User> toEntityUni() {
         User user = new User();
         user.setUsername(this.getUsername());
         user.setEmail(this.getEmail());
         user.setPassword(this.getPassword());
 
         return Uni.createFrom().item(user);
+    }
+
+    public User toEntity() {
+        User user = new User();
+        user.setUsername(this.getUsername());
+        user.setEmail(this.getEmail());
+        user.setPassword(this.getPassword());
+
+        return user;
     }
 }
