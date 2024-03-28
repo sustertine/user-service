@@ -10,7 +10,6 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.jboss.resteasy.reactive.RestResponse;
 
-import java.awt.*;
 import java.util.List;
 
 @Path("/api/users")
@@ -24,10 +23,8 @@ public class UserController {
     public Uni<RestResponse<User>> registerUser(UserRequestDto userRequestDto) {
         return userRequestDto.toEntityUni().onItem()
                 .transformToUni(user -> {
-                    // TODO: Validation and error handling
-
-                    return userRepository.persistAndFlush(user);
-                }
+                            return userRepository.persistAndFlush(user);
+                        }
                 )
                 .map(persisted -> RestResponse.ok());
 
