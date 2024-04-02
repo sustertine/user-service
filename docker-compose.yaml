@@ -1,0 +1,36 @@
+version: '3.8'
+services:
+  mongodb:
+    image: mongo:latest
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+    ports:
+      - "27017:27017"
+  rabbitmq:
+    image: rabbitmq:3.13.0-management-alpine
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+  user-service:
+    build:
+      context: .
+      dockerfile: src/main/docker/Dockerfile.jvm
+    environment:
+      QUARKUS_MONGODB_DATABASE: users
+      QUARKUS_MONGODB_CONNECTION_STRING: mongodb://admin:admin@mongodb:27017
+      AMQP_HOST: rabbitmq
+      AMQP_PORT: 5672
+      AMQP_USERNAME: admin
+      AMQP_PASSWORD: admin
+    depends_on:
+      - mongodb
+      - rabbitmq
+    restart: unless-stopped
+    ports:
+      - "8080:8080"

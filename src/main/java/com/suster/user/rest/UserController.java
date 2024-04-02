@@ -15,6 +15,8 @@ import org.bson.types.ObjectId;
 import java.util.List;
 
 @Path("/api/users")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class UserController {
     @Inject
     private UserRepository userRepository;
@@ -24,7 +26,6 @@ public class UserController {
 
     @Path("/register")
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
     public Uni<Response> registerUser(UserRequestDto userRequestDto) {
         loggingService.logInfo("POST", "/api/users/register", userRequestDto, "Registering user: " + userRequestDto);
         return userRepository.findByEmail(userRequestDto.getEmail()).onItem().transformToUni(user -> {
