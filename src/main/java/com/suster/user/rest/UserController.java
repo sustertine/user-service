@@ -10,6 +10,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.bson.types.ObjectId;
 
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class UserController {
                 loggingService.logWarn("POST", "/api/users/register", userRequestDto, "User with email already exists: " + userRequestDto.getEmail());
                 return Uni.createFrom().item(Response.status(400).entity(new RegisterUserResponse("User with email already exists.")).build());
             } else {
-                return userRequestDto.toEntityUni().onItem().transformToUni(userRepository::persistAndFlush)
+                return userRequestDto.toEntityUni().onItem().transformToUni(userRepository::registerUser)
                         .onItem().transform(user1 -> Response.status(201).entity(user1).build());
             }
         });
@@ -78,9 +79,9 @@ public class UserController {
     @Path("/{id}")
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
-    public Uni<Response> updateUser(@PathParam("id") Long id, UserRequestDto userRequestDto) {
+    public Uni<Response> updateUser(@PathParam("id") String id, UserRequestDto userRequestDto) {
         loggingService.logInfo("PUT", "/api/users/" + id, userRequestDto, "Updating user with id: " + id);
-        return userRepository.findById(id).onItem().transformToUni(user -> {
+        return userRepository.findById(new ObjectId(id)).onItem().transformToUni(user -> {
             if (user == null) {
                 loggingService.logWarn("PUT", "/api/users/" + id, userRequestDto, "User with id not found: " + id);
                 return Uni.createFrom().item(Response.status(404).build());
@@ -88,7 +89,7 @@ public class UserController {
                 user.setUsername(userRequestDto.getUsername());
                 user.setEmail(userRequestDto.getEmail());
                 user.setPassword(userRequestDto.getPassword());
-                return userRepository.persistAndFlush(user).onItem().transform(user1 -> Response.ok(user1).build());
+                return userRepository.persistOrUpdate(user).onItem().transform(user1 -> Response.ok(user1).build());
             }
         });
     }
@@ -96,9 +97,9 @@ public class UserController {
     @Path("/{id}")
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
-    public Uni<Response> deleteUser(@PathParam("id") Long id) {
+    public Uni<Response> deleteUser(@PathParam("id") String id) {
         loggingService.logInfo("DELETE", "/api/users/" + id, null, "Deleting user with id: " + id);
-        return userRepository.findById(id).onItem().transformToUni(user -> {
+        return userRepository.findById(new ObjectId(id)).onItem().transformToUni(user -> {
             if (user == null) {
                 loggingService.logWarn("DELETE", "/api/users/" + id, null, "User with id not found: " + id);
                 return Uni.createFrom().item(Response.status(404).build());

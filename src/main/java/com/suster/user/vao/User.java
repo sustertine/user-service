@@ -1,17 +1,16 @@
 package com.suster.user.vao;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import jakarta.persistence.*;
+import io.quarkus.mongodb.panache.common.MongoEntity;
+import io.quarkus.mongodb.panache.reactive.ReactivePanacheMongoEntity;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Entity
-@Table(name = "users")
 @Data
-public class User extends PanacheEntityBase {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
+@Getter
+@Setter
+@MongoEntity(collection = "users")
+public class User extends ReactivePanacheMongoEntity {
     private String username;
     private String email;
     private String password;
