@@ -1,0 +1,142 @@
+openapi: "3.0.3"
+info:
+  title: "user_service API"
+  description: "user_service API"
+  version: "1.0.0"
+servers:
+  - url: "https://user_service"
+paths:
+  /api/users:
+    get:
+      summary: "GET api/users"
+      operationId: "findAllUsers"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/User"
+  /api/users/get-by-email/{email}:
+    get:
+      summary: "GET api/users/get-by-email/{email}"
+      operationId: "getByEmail"
+      parameters:
+        - name: "email"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+  /api/users/login:
+    post:
+      summary: "POST api/users/login"
+      operationId: "login"
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: "#/components/schemas/UserRequestDto"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+  /api/users/register:
+    post:
+      summary: "POST api/users/register"
+      operationId: "registerUser"
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: "#/components/schemas/UserRequestDto"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Response"
+  /api/users/{id}:
+    put:
+      summary: "PUT api/users/{id}"
+      operationId: "updateUser"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: "#/components/schemas/UserRequestDto"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+    delete:
+      summary: "DELETE api/users/{id}"
+      operationId: "deleteUser"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+components:
+  schemas:
+    ObjectId:
+      type: "object"
+      properties:
+        timestamp:
+          type: "integer"
+          format: "int32"
+    User:
+      type: "object"
+      properties:
+        username:
+          type: "string"
+        email:
+          type: "string"
+        password:
+          type: "string"
+        id:
+          $ref: "#/components/schemas/ObjectId"
+    Response:
+      type: "object"
+      properties: { }
+    UserRequestDto:
+      type: "object"
+      properties:
+        username:
+          type: "string"
+        email:
+          type: "string"
+        password:
+          type: "string"
